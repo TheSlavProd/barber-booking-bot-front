@@ -1,0 +1,228 @@
+.adminPanel {
+  font-family: "Arial", sans-serif;
+  min-height: 100vh;
+  padding: 20px;
+  box-sizing: border-box;
+  background: 
+    linear-gradient(rgba(0,0,0,0.8), rgba(0,0,0,0.8)), 
+    url("/barbershop-bg.jpg") no-repeat center center;
+  background-size: cover;
+  color: #f5f5f5;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 30px;
+  padding: 20px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  backdrop-filter: blur(10px);
+
+  h1 {
+    margin: 0;
+    font-size: 2rem;
+    color: #d4a373;
+  }
+}
+
+.langSwitch {
+  display: flex;
+  gap: 10px;
+
+  button {
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: #fff;
+    padding: 8px 16px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: 0.2s;
+
+    &:hover {
+      background: rgba(255, 255, 255, 0.2);
+    }
+  }
+
+  .active {
+    background: #d4a373;
+    border-color: #d4a373;
+  }
+}
+
+.filters {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+
+  button {
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: #fff;
+    padding: 8px 16px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: 0.2s;
+
+    &:hover {
+      background: rgba(255, 255, 255, 0.2);
+    }
+  }
+
+  .activeFilter {
+    background: #d4a373;
+    border-color: #d4a373;
+  }
+}
+
+.loading {
+  text-align: center;
+  font-size: 1.2rem;
+  padding: 50px;
+  color: #d4a373;
+}
+
+.noBookings {
+  text-align: center;
+  font-size: 1.2rem;
+  padding: 50px;
+  color: #ccc;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 12px;
+}
+
+.bookingsList {
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 12px;
+  padding: 20px;
+  backdrop-filter: blur(10px);
+  overflow-x: auto;
+}
+
+.bookingsTable {
+  width: 100%;
+  border-collapse: collapse;
+  color: #fff;
+
+  th, td {
+    padding: 12px;
+    text-align: left;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  }
+
+  th {
+    background: rgba(255, 255, 255, 0.1);
+    font-weight: bold;
+    color: #d4a373;
+  }
+
+  tr:hover {
+    background: rgba(255, 255, 255, 0.05);
+  }
+}
+
+.status {
+  display: inline-block;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 0.8rem;
+  font-weight: bold;
+  color: white;
+  text-transform: uppercase;
+}
+
+.actions {
+  display: flex;
+  gap: 5px;
+  flex-wrap: wrap;
+
+  button {
+    padding: 4px 8px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.8rem;
+    transition: 0.2s;
+
+    &:hover {
+      opacity: 0.8;
+    }
+  }
+}
+
+.confirmBtn {
+  background: #32cd32;
+  color: white;
+}
+
+.completeBtn {
+  background: #4169e1;
+  color: white;
+}
+
+.cancelBtn {
+  background: #ffa500;
+  color: white;
+}
+
+.deleteBtn {
+  background: #dc143c;
+  color: white;
+}
+
+// Адаптивный дизайн
+@media (max-width: 768px) {
+  .adminPanel {
+    padding: 10px;
+  }
+
+  .header {
+    flex-direction: column;
+    gap: 15px;
+    text-align: center;
+
+    h1 {
+      font-size: 1.5rem;
+    }
+  }
+
+  .filters {
+    justify-content: center;
+  }
+
+  .bookingsTable {
+    font-size: 0.9rem;
+
+    th, td {
+      padding: 8px 4px;
+    }
+  }
+
+  .actions {
+    flex-direction: column;
+    gap: 3px;
+
+    button {
+      font-size: 0.7rem;
+      padding: 3px 6px;
+    }
+  }
+}
+
+@media (max-width: 480px) {
+  .bookingsTable {
+    font-size: 0.8rem;
+
+    th, td {
+      padding: 6px 2px;
+    }
+  }
+
+  .actions button {
+    font-size: 0.6rem;
+    padding: 2px 4px;
+  }
+}
+
