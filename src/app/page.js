@@ -20,16 +20,18 @@ export default function Home() {
   const [availableTimes, setAvailableTimes] = useState([]);
   const [loadingTimes, setLoadingTimes] = useState(false);
 
+  // Telegram Web App init
   useEffect(() => {
     if (typeof window !== "undefined" && window.Telegram?.WebApp) {
       const tg = window.Telegram.WebApp;
-      if (tg.initDataUnsafe?.user) {
-        setChatId(tg.initDataUnsafe.user.id);
-        setUsername(tg.initDataUnsafe.user.first_name || "");
-        // Можно даже автозаполнить имя
-        if (!clientName) {
-          setClientName(tg.initDataUnsafe.user.first_name || "");
-        }
+      tg.ready(); // обязательно
+
+      // Проверяем, есть ли данные пользователя
+      const user = tg.initDataUnsafe?.user;
+      if (user) {
+        setChatId(user.id);
+        setUsername(user.first_name || "");
+        if (!clientName) setClientName(user.first_name || "");
       }
     }
   }, []);
@@ -52,7 +54,7 @@ export default function Home() {
       nameRequired: "Имя обязательно для заполнения",
       phoneRequired: "Телефон обязателен для заполнения",
       dateRequired: "Дата обязательна для заполнения",
-      timeRequired: "Время обязательно для заполнения"
+      timeRequired: "Время обязательно для заполнения",
     },
     hy: {
       clientName: "Հաճախորդի անուն",
@@ -71,39 +73,30 @@ export default function Home() {
       nameRequired: "Անունը պարտադիր է",
       phoneRequired: "Հեռախոսը պարտադիր է",
       dateRequired: "Ամսաթիվը պարտադիր է",
-      timeRequired: "Ժամը պարտադիր է"
+      timeRequired: "Ժամը պարտադիր է",
     },
   };
 
-  const getMinDate = () => {
-    const today = new Date();
-    return today.toISOString().split('T')[0];
-  };
-
+  const getMinDate = () => new Date().toISOString().split("T")[0];
   const getMaxDate = () => {
     const maxDate = new Date();
     maxDate.setDate(maxDate.getDate() + 5);
-    return maxDate.toISOString().split('T')[0];
+    return maxDate.toISOString().split("T")[0];
   };
 
   const fetchAvailableTimes = async (selectedDate, selectedMaster) => {
     if (!selectedDate) return;
-    
     setLoadingTimes(true);
     try {
-      const response = await fetch(`${API_URL}/api/bookings/available-times?date=${selectedDate}&master=${selectedMaster}`);
-      if (response.ok) {
-        const times = await response.json();
+      const res = await fetch(
+        `${API_URL}/api/bookings/available-times?date=${selectedDate}&master=${selectedMaster}`
+      );
+      if (res.ok) {
+        const times = await res.json();
         setAvailableTimes(times);
-        if (time && !times.includes(time)) {
-          setTime("");
-        }
-      } else {
-        console.error("Failed to fetch available times");
-        setAvailableTimes([]);
-      }
-    } catch (error) {
-      console.error("Error fetching available times:", error);
+        if (time && !times.includes(time)) setTime("");
+      } else setAvailableTimes([]);
+    } catch {
       setAvailableTimes([]);
     } finally {
       setLoadingTimes(false);
@@ -119,9 +112,7 @@ export default function Home() {
   const handleMasterChange = (newMaster) => {
     setMaster(newMaster);
     setTime("");
-    if (date) {
-      fetchAvailableTimes(date, newMaster);
-    }
+    if (date) fetchAvailableTimes(date, newMaster);
   };
 
   const showMessage = (text, type) => {
@@ -143,23 +134,23 @@ export default function Home() {
   };
 
   const handleBooking = async () => {
-    const validationErrors = validateForm();
-    if (validationErrors.length > 0) {
-      showMessage(validationErrors.join(", "), "error");
+    const errors = validateForm();
+    if (errors.length > 0) {
+      showMessage(errors.join(", "), "error");
       return;
     }
 
     setLoading(true);
 
-    const newBooking = { 
-      clientName, 
-      service, 
-      master, 
-      date, 
-      time, 
+    const newBooking = {
+      clientName,
+      service,
+      master,
+      date,
+      time,
       phone,
-      userChatId: chatId,   // <--- добавили chatId
-      telegramName: username // <--- добавили имя из Telegram
+      userChatId: chatId, // telegram user id
+      telegramName: username, // telegram first_name
     };
 
     try {
@@ -171,22 +162,18 @@ export default function Home() {
 
       if (res.ok) {
         showMessage(texts[lang].success, "success");
-        setClientName("");
+        setClientName(username || "");
         setDate("");
         setTime("");
         setPhone("");
       } else {
-        const errorData = await res.json();
-        if (res.status === 409) {
-          showMessage(texts[lang].slotTaken, "error");
-        } else if (res.status === 400 && errorData.details) {
-          showMessage(errorData.details.join(", "), "error");
-        } else {
-          showMessage(texts[lang].error, "error");
-        }
+        const data = await res.json();
+        if (res.status === 409) showMessage(texts[lang].slotTaken, "error");
+        else if (res.status === 400 && data.details)
+          showMessage(data.details.join(", "), "error");
+        else showMessage(texts[lang].error, "error");
       }
-    } catch (err) {
-      console.error(err);
+    } catch {
       showMessage(texts[lang].connectionError, "error");
     } finally {
       setLoading(false);
@@ -198,8 +185,18 @@ export default function Home() {
       <header className={styles.header}>
         <div className={styles.headerContent}>
           <div className={styles.langSwitch}>
-            <button onClick={() => setLang("ru")} className={lang === "ru" ? styles.active : ""}>RU</button>
-            <button onClick={() => setLang("hy")} className={lang === "hy" ? styles.active : ""}>HY</button>
+            <button
+              onClick={() => setLang("ru")}
+              className={lang === "ru" ? styles.active : ""}
+            >
+              RU
+            </button>
+            <button
+              onClick={() => setLang("hy")}
+              className={lang === "hy" ? styles.active : ""}
+            >
+              HY
+            </button>
           </div>
         </div>
       </header>
@@ -217,7 +214,9 @@ export default function Home() {
             type="text"
             value={clientName}
             onChange={(e) => setClientName(e.target.value)}
-            placeholder={lang === "ru" ? "Введите ваше имя" : "Մուտքագրեք ձեր անունը"}
+            placeholder={
+              lang === "ru" ? "Введите ваше имя" : "Մուտքագրեք ձեր անունը"
+            }
             required
           />
         </div>
@@ -226,23 +225,26 @@ export default function Home() {
           <label>{texts[lang].service}</label>
           <select value={service} onChange={(e) => setService(e.target.value)}>
             <option value="haircut">Մազերի կտրվածք</option>
-            <option value="hairBeard">Մազեր + մորուք</option>
+            <option value="hairBeard">Մազ + մորուք</option>
             <option value="beard">Մորուք</option>
           </select>
         </div>
 
         <div className={styles.field}>
           <label>{texts[lang].master}</label>
-          <select value={master} onChange={(e) => handleMasterChange(e.target.value)}>
+          <select
+            value={master}
+            onChange={(e) => handleMasterChange(e.target.value)}
+          >
             <option value="gegham">Գեղամ</option>
           </select>
         </div>
 
         <div className={styles.field}>
           <label>{texts[lang].date} *</label>
-          <input 
-            type="date" 
-            value={date} 
+          <input
+            type="date"
+            value={date}
             onChange={(e) => handleDateChange(e.target.value)}
             min={getMinDate()}
             max={getMaxDate()}
@@ -254,26 +256,33 @@ export default function Home() {
           <label>{texts[lang].time} *</label>
           {loadingTimes ? (
             <div className={styles.loadingTimes}>
-              {lang === "ru" ? "Загрузка доступных времен..." : "Բեռնվում են հասանելի ժամերը..."}
+              {lang === "ru"
+                ? "Загрузка доступных времен..."
+                : "Բեռնվում են հասանելի ժամերը..."}
             </div>
           ) : (
-            <select 
-              value={time} 
+            <select
+              value={time}
               onChange={(e) => setTime(e.target.value)}
               required
               disabled={!date || availableTimes.length === 0}
             >
               <option value="">
-                {!date 
-                  ? (lang === "ru" ? "Сначала выберите дату" : "Նախ ընտրեք ամսաթիվը")
-                  : availableTimes.length === 0 
-                    ? (lang === "ru" ? "Нет доступных времен" : "Հասանելի ժամեր չկան")
-                    : (lang === "ru" ? "Выберите время" : "Ընտրեք ժամը")
-                }
+                {!date
+                  ? lang === "ru"
+                    ? "Сначала выберите дату"
+                    : "Նախ ընտրեք ամսաթիվը"
+                  : availableTimes.length === 0
+                  ? lang === "ru"
+                    ? "Нет доступных времен"
+                    : "Հասանելի ժամեր չկան"
+                  : lang === "ru"
+                  ? "Выберите время"
+                  : "Ընտրեք ժամը"}
               </option>
-              {availableTimes.map(timeSlot => (
-                <option key={timeSlot} value={timeSlot}>
-                  {timeSlot}
+              {availableTimes.map((slot) => (
+                <option key={slot} value={slot}>
+                  {slot}
                 </option>
               ))}
             </select>
@@ -291,8 +300,8 @@ export default function Home() {
           />
         </div>
 
-        <button 
-          className={styles.bookBtn} 
+        <button
+          className={styles.bookBtn}
           onClick={handleBooking}
           disabled={loading}
         >
