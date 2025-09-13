@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import styles from "./page.module.scss";
 
 export default function Home() {
@@ -12,11 +12,27 @@ export default function Home() {
   const [date, setDate] = useState("");
   const [time, setTime] = useState("");
   const [phone, setPhone] = useState("");
+  const [chatId, setChatId] = useState(null);
+  const [username, setUsername] = useState("");
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
   const [messageType, setMessageType] = useState("");
   const [availableTimes, setAvailableTimes] = useState([]);
   const [loadingTimes, setLoadingTimes] = useState(false);
+
+  useEffect(() => {
+    if (typeof window !== "undefined" && window.Telegram?.WebApp) {
+      const tg = window.Telegram.WebApp;
+      if (tg.initDataUnsafe?.user) {
+        setChatId(tg.initDataUnsafe.user.id);
+        setUsername(tg.initDataUnsafe.user.first_name || "");
+        // Можно даже автозаполнить имя
+        if (!clientName) {
+          setClientName(tg.initDataUnsafe.user.first_name || "");
+        }
+      }
+    }
+  }, []);
 
   const texts = {
     ru: {
@@ -59,7 +75,6 @@ export default function Home() {
     },
   };
 
-  // Функции для работы с датами
   const getMinDate = () => {
     const today = new Date();
     return today.toISOString().split('T')[0];
@@ -71,7 +86,6 @@ export default function Home() {
     return maxDate.toISOString().split('T')[0];
   };
 
-  // Получение доступных временных слотов
   const fetchAvailableTimes = async (selectedDate, selectedMaster) => {
     if (!selectedDate) return;
     
@@ -81,7 +95,6 @@ export default function Home() {
       if (response.ok) {
         const times = await response.json();
         setAvailableTimes(times);
-        // Сбросить выбранное время, если оно больше не доступно
         if (time && !times.includes(time)) {
           setTime("");
         }
@@ -97,16 +110,15 @@ export default function Home() {
     }
   };
 
-  // Обработчики изменений
   const handleDateChange = (newDate) => {
     setDate(newDate);
-    setTime(""); // Сбросить время при изменении даты
+    setTime("");
     fetchAvailableTimes(newDate, master);
   };
 
   const handleMasterChange = (newMaster) => {
     setMaster(newMaster);
-    setTime(""); // Сбросить время при изменении мастера
+    setTime("");
     if (date) {
       fetchAvailableTimes(date, newMaster);
     }
@@ -138,7 +150,17 @@ export default function Home() {
     }
 
     setLoading(true);
-    const newBooking = { clientName, service, master, date, time, phone };
+
+    const newBooking = { 
+      clientName, 
+      service, 
+      master, 
+      date, 
+      time, 
+      phone,
+      userChatId: chatId,   // <--- добавили chatId
+      telegramName: username // <--- добавили имя из Telegram
+    };
 
     try {
       const res = await fetch(`${API_URL}/api/bookings`, {
