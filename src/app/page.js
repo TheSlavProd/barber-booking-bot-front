@@ -456,6 +456,17 @@ export default function Home() {
           {loading ? texts[lang].booking : texts[lang].book}
         </button>
       </main>
+      <footer style={{ marginTop: "20px", textAlign: "center", fontSize: "14px", color: "rgb(163 161 161)" }}>
+        Bot-ի հեղինակ{" "}
+        <a
+          href="https://t.me/theslavprod"
+          target="_blank"
+          rel="noopener noreferrer"
+          style={{ color: "red", textDecoration: "none", fontWeight: "bold" }}
+        >
+          @theslavprod
+        </a>
+      </footer>
     </div>
   );
 }
