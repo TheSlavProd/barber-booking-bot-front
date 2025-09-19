@@ -81,6 +81,7 @@
     opacity: 0;
     transform: translateY(-10px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -118,6 +119,7 @@
     background: var(--panel);
     color: var(--panel-foreground);
     outline: none;
+    min-height: 15px;
 
     &:disabled {
       background: #f3f4f6;
@@ -134,7 +136,8 @@
     label {
       display: inline-flex;
       align-items: center;
-      gap: 10px; /* отступ справа от кружка */
+      gap: 10px;
+      /* отступ справа от кружка */
       cursor: pointer;
 
       input[type="radio"] {
@@ -147,7 +150,7 @@
 /* Разделители между полями внутри общей панели */
 .field:not(:last-child) {
   border-bottom: 1px solid var(--border);
-  margin-bottom: 4px;
+  //margin-bottom: 4px;
   padding-bottom: 8px;
 }
 
