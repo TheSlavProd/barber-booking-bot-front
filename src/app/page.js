@@ -1,6 +1,7 @@
 "use client";
 import { useState, useEffect } from "react";
 import styles from "./page.module.scss";
+import RequiredLabel from "./RequiredLabel";
 
 export default function Home() {
   const API_URL = process.env.NEXT_PUBLIC_API_URL;
@@ -301,7 +302,7 @@ export default function Home() {
 
       <main className={styles.content}>
         <div className={styles.field}>
-          <label>{texts[lang].clientName} *</label>
+          <label><RequiredLabel>{texts[lang].clientName}</RequiredLabel></label>
           <input
             type="text"
             value={clientName}
@@ -368,7 +369,7 @@ export default function Home() {
         </div>
 
         <div className={styles.field}>
-          <label>{texts[lang].date} *</label>
+          <label><RequiredLabel>{texts[lang].date}</RequiredLabel></label>
           {isIOS ? (
             <select
               value={date}
@@ -397,7 +398,7 @@ export default function Home() {
         </div>
 
         <div className={styles.field}>
-          <label>{texts[lang].time} *</label>
+          <label><RequiredLabel>{texts[lang].time}</RequiredLabel></label>
           {loadingTimes ? (
             <div className={styles.loadingTimes}>
               {lang === "ru"
@@ -417,12 +418,12 @@ export default function Home() {
                     ? "Сначала выберите дату"
                     : "Նախ ընտրեք ամսաթիվը"
                   : availableTimes.length === 0
-                  ? lang === "ru"
-                    ? "Нет доступных времен"
-                    : "Հասանելի ժամեր չկան"
-                  : lang === "ru"
-                  ? "Выберите время"
-                  : "Ընտրեք ժամը"}
+                    ? lang === "ru"
+                      ? "Нет доступных времен"
+                      : "Հասանելի ժամեր չկան"
+                    : lang === "ru"
+                      ? "Выберите время"
+                      : "Ընտրեք ժամը"}
               </option>
               {availableTimes.map((slot) => (
                 <option key={slot} value={slot}>
@@ -434,7 +435,7 @@ export default function Home() {
         </div>
 
         <div className={styles.field}>
-          <label>{texts[lang].phone} *</label>
+          <label><RequiredLabel>{texts[lang].phone}</RequiredLabel></label>
           <input
             type="tel"
             value={phone}
