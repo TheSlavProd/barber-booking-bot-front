@@ -97,6 +97,25 @@ export default function Home() {
     return toYYYYMMDDLocal(maxDate);
   };
 
+  // Детект iOS
+  const isIOS = typeof navigator !== "undefined" && /iPad|iPhone|iPod/.test(navigator.userAgent);
+
+  // Список доступных дат [завтра..+5]
+  const getAllowedDates = () => {
+    const dates = [];
+    const start = new Date();
+    start.setDate(start.getDate() + 1);
+    for (let i = 0; i <= 5; i++) {
+      const d = new Date(start);
+      d.setDate(start.getDate() + i);
+      dates.push({
+        value: toYYYYMMDDLocal(d),
+        label: toYYYYMMDDLocal(d),
+      });
+    }
+    return dates;
+  };
+
   const isDateAllowed = (dateStr) => {
     if (!dateStr) return false;
     const min = getMinDate();
@@ -296,11 +315,46 @@ export default function Home() {
 
         <div className={styles.field}>
           <label>{texts[lang].service}</label>
-          <select value={service} onChange={(e) => handleServiceChange(e.target.value)}>
-            <option value="haircut">Մազերի կտրվածք</option>
-            <option value="hairBeard">Մազ + մորուք</option>
-            <option value="beard">Մորուք</option>
-          </select>
+          {isIOS ? (
+            <div className={styles.radioGroup}>
+              <label>
+                <input
+                  type="radio"
+                  name="service"
+                  value="haircut"
+                  checked={service === "haircut"}
+                  onChange={(e) => handleServiceChange(e.target.value)}
+                />
+                Մազերի կտրվածք
+              </label>
+              <label>
+                <input
+                  type="radio"
+                  name="service"
+                  value="hairBeard"
+                  checked={service === "hairBeard"}
+                  onChange={(e) => handleServiceChange(e.target.value)}
+                />
+                Մազ + մորուք
+              </label>
+              <label>
+                <input
+                  type="radio"
+                  name="service"
+                  value="beard"
+                  checked={service === "beard"}
+                  onChange={(e) => handleServiceChange(e.target.value)}
+                />
+                Մորուք
+              </label>
+            </div>
+          ) : (
+            <select value={service} onChange={(e) => handleServiceChange(e.target.value)}>
+              <option value="haircut">Մազերի կտրվածք</option>
+              <option value="hairBeard">Մազ + մորուք</option>
+              <option value="beard">Մորուք</option>
+            </select>
+          )}
         </div>
 
         <div className={styles.field}>
@@ -315,16 +369,31 @@ export default function Home() {
 
         <div className={styles.field}>
           <label>{texts[lang].date} *</label>
-          <input
-            type="date"
-            value={date}
-            onChange={(e) => handleDateChange(e.target.value)}
-            min={getMinDate()}
-            max={getMaxDate()}
-            inputMode="none"
-            onKeyDown={(e) => e.preventDefault()}
-            required
-          />
+          {isIOS ? (
+            <select
+              value={date}
+              onChange={(e) => handleDateChange(e.target.value)}
+              required
+            >
+              <option value="">{lang === "ru" ? "Выберите дату" : "Ընտրեք ամսաթիվը"}</option>
+              {getAllowedDates().map((d) => (
+                <option key={d.value} value={d.value}>
+                  {d.label}
+                </option>
+              ))}
+            </select>
+          ) : (
+            <input
+              type="date"
+              value={date}
+              onChange={(e) => handleDateChange(e.target.value)}
+              min={getMinDate()}
+              max={getMaxDate()}
+              inputMode="none"
+              onKeyDown={(e) => e.preventDefault()}
+              required
+            />
+          )}
         </div>
 
         <div className={styles.field}>
