@@ -1,26 +1,26 @@
 :root {
   /* Темная палитра по умолчанию */
   --background: #0e1116;
-  --foreground: #343333;
+  --foreground: #000000; /* черный текст везде */
   --primary: #3b82f6;
   --primary-contrast: #0b0f17;
-  --muted: #d1e2f8;
+  --muted: #000000; /* черный для приглушенного текста */
   --border: #0055ff; /* светлая рамка для светлых панелей */
   --panel: #dedcdc; /* панели беловатые */
-  --panel-foreground: #1a1b1e; /* текст на панелях */
+  --panel-foreground: #000000; /* черный текст на панелях */
 }
 
 /* Сохраняем те же значения в тёмной схеме для консистентности */
 @media (prefers-color-scheme: dark) {
   :root {
     --background: #0e1116;
-    --foreground: #e6e8eb;
+    --foreground: #000000; /* черный текст везде */
     --primary: #3b82f6;
     --primary-contrast: #0b0f17;
-    --muted: #94a3b8;
-    --border: #e5e7eb;
-    --panel: #ffffff;
-    --panel-foreground: #1a1b1e;
+    --muted: #000000; /* черный для приглушенного текста */
+    --border: #0055ff;
+    --panel: #dedcdc;
+    --panel-foreground: #000000; /* черный текст на панелях */
   }
 }
 
