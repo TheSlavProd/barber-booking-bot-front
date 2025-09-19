@@ -55,6 +55,7 @@ export default function Home() {
       phoneRequired: "Телефон обязателен для заполнения",
       dateRequired: "Дата обязательна для заполнения",
       timeRequired: "Время обязательно для заполнения",
+      dateOutOfRange: "Доступны даты: завтра и ещё 5 дней",
     },
     hy: {
       clientName: "Հաճախորդի անուն",
@@ -74,22 +75,41 @@ export default function Home() {
       phoneRequired: "Հեռախոսը պարտադիր է",
       dateRequired: "Ամսաթիվը պարտադիր է",
       timeRequired: "Ժամը պարտադիր է",
+      dateOutOfRange: "Մատչելի են թեթեւեից հետո + 5 օր",
     },
   };
 
-  const getMinDate = () => new Date().toISOString().split("T")[0];
+  const toYYYYMMDDLocal = (d) => {
+    const yyyy = d.getFullYear();
+    const mm = String(d.getMonth() + 1).padStart(2, "0");
+    const dd = String(d.getDate()).padStart(2, "0");
+    return `${yyyy}-${mm}-${dd}`;
+  };
+
+  const getMinDate = () => {
+    const d = new Date();
+    d.setDate(d.getDate() + 1); // скрываем сегодняшний день
+    return toYYYYMMDDLocal(d);
+  };
   const getMaxDate = () => {
     const maxDate = new Date();
     maxDate.setDate(maxDate.getDate() + 5);
-    return maxDate.toISOString().split("T")[0];
+    return toYYYYMMDDLocal(maxDate);
   };
 
-  const fetchAvailableTimes = async (selectedDate, selectedMaster) => {
+  const isDateAllowed = (dateStr) => {
+    if (!dateStr) return false;
+    const min = getMinDate();
+    const max = getMaxDate();
+    return dateStr >= min && dateStr <= max;
+  };
+
+  const fetchAvailableTimes = async (selectedDate, selectedMaster, selectedService) => {
     if (!selectedDate) return;
     setLoadingTimes(true);
     try {
       const res = await fetch(
-        `${API_URL}/api/bookings/available-times?date=${selectedDate}&master=${selectedMaster}`
+        `${API_URL}/api/bookings/available-times?date=${selectedDate}&master=${selectedMaster}&service=${selectedService}`
       );
       if (res.ok) {
         const times = await res.json();
@@ -103,16 +123,62 @@ export default function Home() {
     }
   };
 
+  // Маска телефона: всегда префикс +374 и формат +374 (XX) XXX-XXX
+  useEffect(() => {
+    if (!phone) setPhone("+374 (");
+  }, []);
+
+  const formatArPhone = (raw) => {
+    const digits = (raw || "").replace(/\D/g, "");
+    const rest = digits.startsWith("374") ? digits.slice(3) : digits;
+    const limited = rest.slice(0, 8); // 2 + 3 + 3 = 8
+    const a = limited.slice(0, 2); // XX
+    const b = limited.slice(2, 5); // XXX
+    const c = limited.slice(5, 8); // XXX
+
+    let result = "+374 (";
+    result += a;
+    if (a.length === 2) result += ") ";
+    if (b.length) result += b;
+    if (c.length) result += `-${c}`;
+
+    return result;
+  };
+
+  const handlePhoneChange = (value) => {
+    setPhone(formatArPhone(value));
+  };
+
+  // Защита от удаления префикса и скобки при фокусе
+  const handlePhoneKeyDown = (e) => {
+    const value = e.currentTarget.value || "";
+    const selectionStart = e.currentTarget.selectionStart ?? 0;
+    // Блокируем backspace/delete в зоне префикса '+374 ('
+    if ((e.key === "Backspace" && selectionStart <= 6) || (e.key === "Delete" && selectionStart < 6)) {
+      e.preventDefault();
+    }
+  };
+
   const handleDateChange = (newDate) => {
+    if (!isDateAllowed(newDate)) {
+      showMessage(texts[lang].dateOutOfRange, "error");
+      return;
+    }
     setDate(newDate);
     setTime("");
-    fetchAvailableTimes(newDate, master);
+    fetchAvailableTimes(newDate, master, service);
   };
 
   const handleMasterChange = (newMaster) => {
     setMaster(newMaster);
     setTime("");
-    if (date) fetchAvailableTimes(date, newMaster);
+    if (date) fetchAvailableTimes(date, newMaster, service);
+  };
+
+  const handleServiceChange = (newService) => {
+    setService(newService);
+    setTime("");
+    if (date) fetchAvailableTimes(date, master, newService);
   };
 
   const showMessage = (text, type) => {
@@ -142,13 +208,20 @@ export default function Home() {
 
     setLoading(true);
 
+    const normalizeArPhone = (raw) => {
+      const digits = (raw || "").replace(/\D/g, "");
+      const rest = digits.startsWith("374") ? digits.slice(3) : digits;
+      const limited = rest.slice(0, 8);
+      return `+374${limited}`;
+    };
+
     const newBooking = {
       clientName,
       service,
       master,
       date,
       time,
-      phone,
+      phone: normalizeArPhone(phone),
       userChatId: chatId, // telegram user id
       telegramName: username, // telegram first_name
     };
@@ -223,7 +296,7 @@ export default function Home() {
 
         <div className={styles.field}>
           <label>{texts[lang].service}</label>
-          <select value={service} onChange={(e) => setService(e.target.value)}>
+          <select value={service} onChange={(e) => handleServiceChange(e.target.value)}>
             <option value="haircut">Մազերի կտրվածք</option>
             <option value="hairBeard">Մազ + մորուք</option>
             <option value="beard">Մորուք</option>
@@ -248,6 +321,8 @@ export default function Home() {
             onChange={(e) => handleDateChange(e.target.value)}
             min={getMinDate()}
             max={getMaxDate()}
+            inputMode="none"
+            onKeyDown={(e) => e.preventDefault()}
             required
           />
         </div>
@@ -294,8 +369,11 @@ export default function Home() {
           <input
             type="tel"
             value={phone}
-            onChange={(e) => setPhone(e.target.value)}
-            placeholder="+374 XX XXX XXX"
+            onChange={(e) => handlePhoneChange(e.target.value)}
+            onBlur={(e) => setPhone(formatArPhone(e.target.value))}
+            onKeyDown={handlePhoneKeyDown}
+            placeholder="+374 (XX) XXX-XXX"
+            inputMode="numeric"
             required
           />
         </div>
