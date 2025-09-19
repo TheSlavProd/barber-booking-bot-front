@@ -1,4 +1,5 @@
 import { Geist, Geist_Mono } from "next/font/google";
+import Script from "next/script";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -19,8 +20,12 @@ export const metadata = {
 export default function RootLayout({ children }) {
   return (
     <html lang="en">
-      <script src="https://telegram.org/js/telegram-web-app.js?59"></script>
       <body className={`${geistSans.variable} ${geistMono.variable}`}>
+        {/* Подключение Telegram WebApp SDK */}
+        <Script
+          src="https://telegram.org/js/telegram-web-app.js?59"
+          strategy="beforeInteractive"
+        />
         {children}
       </body>
     </html>
