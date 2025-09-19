@@ -1,18 +1,12 @@
 .app {
-  font-family: "Arial", sans-serif;
   min-height: 100vh;
-  padding: 20px;
+  padding: 12px;
   box-sizing: border-box;
-
-  background: 
-    linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)), 
-    url("/barbershop-bg.jpg") no-repeat center center;
-  background-size: cover;
-  color: #f5f5f5;
+  color: var(--foreground);
 }
 
 .header {
-  padding: 10px;
+  padding: 6px;
 }
 
 .headerContent {
@@ -26,58 +20,59 @@
   gap: 10px;
 
   button {
-    background: rgba(255, 255, 255, 0.1);
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    color: #fff;
-    padding: 6px 12px;
-    border-radius: 8px;
+    background: var(--panel);
+    border: 1px solid var(--border);
+    color: var(--foreground);
+    padding: 8px 14px;
+    border-radius: 10px;
     cursor: pointer;
     transition: 0.2s;
 
     &:hover {
-      background: rgba(255, 255, 255, 0.2);
+      background: #eef2ff;
     }
   }
 
   .active {
-    background: #d4a373;
-    border-color: #d4a373;
+    background: var(--primary);
+    color: var(--primary-contrast);
+    border-color: var(--primary);
   }
 }
 
 .adminLink {
-  background: rgba(255, 255, 255, 0.1);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  color: #fff;
-  padding: 8px 16px;
-  border-radius: 8px;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  color: var(--foreground);
+  padding: 8px 14px;
+  border-radius: 10px;
   text-decoration: none;
   transition: 0.2s;
   font-size: 0.9rem;
 
   &:hover {
-    background: rgba(255, 255, 255, 0.2);
+    background: #eef2ff;
   }
 }
 
 .message {
-  margin: 15px 0;
-  padding: 12px;
+  margin: 8px 0;
+  padding: 8px;
   border-radius: 8px;
   text-align: center;
   font-weight: bold;
   animation: slideIn 0.3s ease-out;
 
   &.success {
-    background: rgba(50, 205, 50, 0.2);
-    border: 1px solid #32cd32;
-    color: #32cd32;
+    background: #ecfdf5;
+    border: 1px solid #10b981;
+    color: #065f46;
   }
 
   &.error {
-    background: rgba(220, 20, 60, 0.2);
-    border: 1px solid #dc143c;
-    color: #dc143c;
+    background: #fef2f2;
+    border: 1px solid #ef4444;
+    color: #991b1b;
   }
 }
 
@@ -95,15 +90,18 @@
 .content {
   display: flex;
   flex-direction: column;
-  gap: 15px;
+  gap: 0;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 8px;
 }
 
 .field {
-  background: rgba(255, 255, 255, 0.07);
-  padding: 12px;
-  border-radius: 12px;
-  backdrop-filter: blur(6px);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: transparent;
+  padding: 8px 4px;
+  border-radius: 0;
+  border: 0;
 
   label {
     font-weight: bold;
@@ -113,49 +111,72 @@
 
   select,
   input {
-    padding: 10px;
-    border: none;
-    border-radius: 8px;
+    padding: 12px;
+    border: 1px solid var(--border);
+    border-radius: 10px;
     font-size: 16px;
-    background: #333;
-    color: #fff;
+    background: var(--panel);
+    color: var(--panel-foreground);
     outline: none;
 
     &:disabled {
-      background: #555;
-      color: #999;
+      background: #f3f4f6;
+      color: var(--muted);
       cursor: not-allowed;
+    }
+  }
+
+  /* Отступ для radio-кнопок на iOS блоке услуг */
+  .radioGroup {
+    display: grid;
+    gap: 8px;
+
+    label {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px; /* отступ справа от кружка */
+      cursor: pointer;
+
+      input[type="radio"] {
+        accent-color: var(--primary);
+      }
     }
   }
 }
 
+/* Разделители между полями внутри общей панели */
+.field:not(:last-child) {
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 4px;
+  padding-bottom: 8px;
+}
+
 .loadingTimes {
-  padding: 10px;
+  padding: 6px;
   text-align: center;
-  color: #d4a373;
-  font-style: italic;
-  background: rgba(212, 163, 115, 0.1);
-  border-radius: 8px;
-  border: 1px solid rgba(212, 163, 115, 0.3);
+  color: var(--muted);
+  background: #f8fafc;
+  border-radius: 10px;
+  border: 1px solid var(--border);
 }
 
 .bookBtn {
-  margin-top: 20px;
-  padding: 12px;
-  background: #d4a373;
-  color: white;
-  border: none;
-  border-radius: 10px;
-  font-size: 18px;
+  margin-top: 8px;
+  padding: 10px;
+  background: var(--primary);
+  color: var(--primary-contrast);
+  border: 1px solid var(--primary);
+  border-radius: 12px;
+  font-size: 16px;
   cursor: pointer;
   transition: background 0.2s;
 
   &:hover:not(:disabled) {
-    background: #b8864f;
+    background: #1d4ed8;
   }
 
   &:disabled {
-    background: #666;
+    background: #9ca3af;
     cursor: not-allowed;
     opacity: 0.7;
   }
@@ -163,10 +184,11 @@
 
 .bookingsList {
   margin-top: 30px;
-  background: rgba(0,0,0,0.5);
-  padding: 15px;
+  background: var(--panel);
+  padding: 16px;
   border-radius: 12px;
-  color: #fff;
+  color: var(--foreground);
+  border: 1px solid var(--border);
 
   h3 {
     margin-top: 0;
@@ -178,7 +200,7 @@
 
     li {
       padding: 5px 0;
-      border-bottom: 1px solid rgba(255,255,255,0.2);
+      border-bottom: 1px solid var(--border);
     }
   }
 }
@@ -196,7 +218,7 @@
   }
 
   .content {
-    gap: 12px;
+    gap: 6px;
   }
 
   .field {

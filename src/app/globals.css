@@ -1,12 +1,26 @@
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  /* Темная палитра по умолчанию */
+  --background: #0e1116;
+  --foreground: #343333;
+  --primary: #3b82f6;
+  --primary-contrast: #0b0f17;
+  --muted: #d1e2f8;
+  --border: #0055ff; /* светлая рамка для светлых панелей */
+  --panel: #dedcdc; /* панели беловатые */
+  --panel-foreground: #1a1b1e; /* текст на панелях */
 }
 
+/* Сохраняем те же значения в тёмной схеме для консистентности */
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+    --background: #0e1116;
+    --foreground: #e6e8eb;
+    --primary: #3b82f6;
+    --primary-contrast: #0b0f17;
+    --muted: #94a3b8;
+    --border: #e5e7eb;
+    --panel: #ffffff;
+    --panel-foreground: #1a1b1e;
   }
 }
 
@@ -18,8 +32,13 @@ body {
 
 body {
   color: var(--foreground);
-  background: var(--background);
-  font-family: Arial, Helvetica, sans-serif;
+  /* Темный фон с нежным узором (точки) */
+  background-color: var(--background);
+  background-image:
+    radial-gradient(circle at 25px 25px, rgba(255,255,255,0.04) 1px, transparent 1px),
+    radial-gradient(circle at 75px 75px, rgba(255,255,255,0.04) 1px, transparent 1px);
+  background-size: 100px 100px;
+  font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial, "Noto Sans", "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
