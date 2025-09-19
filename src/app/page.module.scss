@@ -108,12 +108,6 @@
     font-weight: bold;
     margin-bottom: 3px;
     display: block;
-    
-    /* Красные астериксы для обязательных полей */
-    &::after {
-      content: " *";
-      color: #ef4444;
-    }
   }
 
   select,
